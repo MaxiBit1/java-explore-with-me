@@ -13,8 +13,8 @@
     <packaging>pom</packaging>
     <modules>
         <module>dto</module>
-        <module>main</module>
-        <module>client</module>
+        <module>stat-server</module>
+        <module>stat-client</module>
     </modules>
 
 </project>
