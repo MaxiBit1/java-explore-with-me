@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<modules>
 		<module>main-prog</module>
-		<module>statistic</module>
+		<module>stats-service</module>
 	</modules>
 
 	<parent>
