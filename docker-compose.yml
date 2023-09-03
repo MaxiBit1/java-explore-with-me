@@ -3,7 +3,7 @@ services:
   statistic-prog:
     build: ./stats-service/stats-server
     image: statistic-image
-    container_name: statistic-prog-container
+    container_name: stats-service
     depends_on:
       - stats-db
     ports:
@@ -27,7 +27,7 @@ services:
   ewm-service:
     build: ./main-service
     image: main-image
-    container_name: main-prog-container
+    container_name: ewm-service
     depends_on:
       - ewm-db
     ports:
