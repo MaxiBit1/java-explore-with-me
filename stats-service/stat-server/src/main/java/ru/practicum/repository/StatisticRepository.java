@@ -17,12 +17,5 @@ public interface StatisticRepository extends JpaRepository<StatisticEntity, Long
             "where s.timestamp between ?1 and ?2 group by s.app, s.uri order by count(s.ip) desc")
     List<StatisticDtoEnd> findAllByTimestampBetweenDistinct(LocalDateTime start, LocalDateTime end);
 
-    @Query("select new ru.practicum.dto.StatisticDtoEnd(s.app, s.uri, count(s.ip)) from StatisticEntity as s " +
-            "where s.uri IN ?1 and s.timestamp between ?2 and ?3 group by s.app, s.uri order by count(s.ip) desc")
-    List<StatisticDtoEnd> findAllByTimestampBetweenAndUris(List<String> uris, LocalDateTime start, LocalDateTime end);
-
-    @Query("select new ru.practicum.dto.StatisticDtoEnd(s.app, s.uri, count(distinct s.ip)) from StatisticEntity as s " +
-            "where s.uri IN ?1 and s.timestamp between ?2 and ?3 group by s.app, s.uri order by count(s.ip) desc")
-    List<StatisticDtoEnd> findAllByTimestampBetweenDistinctAndUris(List<String> uris, LocalDateTime start, LocalDateTime end);
 
 }

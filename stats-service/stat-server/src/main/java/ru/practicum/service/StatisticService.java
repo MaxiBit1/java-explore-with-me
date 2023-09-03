@@ -6,7 +6,7 @@ import ru.practicum.dto.StatisticDtoEnd;
 import java.util.List;
 
 public interface StatisticService {
-    void save(StatisticDto dto);
+    StatisticDto save(StatisticDto dto);
 
     List<StatisticDtoEnd> getStats(String start, String end, List<String> uris, Boolean unique);
 }

@@ -20,10 +20,12 @@ public class StatisticController {
     private final StatisticService statisticService;
 
     @PostMapping("/hit")
-    public ResponseEntity<String> create(@Valid @RequestBody StatisticDto statisticDto) {
-        log.info("Statistic from " + statisticDto.getIp() + " save");
-        statisticService.save(statisticDto);
-        return new ResponseEntity<>("Info save", HttpStatus.CREATED);
+    public ResponseEntity<StatisticDto> create(@Valid @RequestBody StatisticDto statisticDto) {
+        log.info("Statistic ip: " + statisticDto.getIp() +
+                " uri: " + statisticDto.getUri() +
+                " app: " + statisticDto.getApp() +
+                " timestamp " + statisticDto.getTimestamp() + " save");
+        return new ResponseEntity<>(statisticService.save(statisticDto), HttpStatus.CREATED);
     }
 
     @GetMapping("/stats")
