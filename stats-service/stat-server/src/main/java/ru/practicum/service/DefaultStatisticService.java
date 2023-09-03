@@ -19,7 +19,7 @@ public class DefaultStatisticService implements StatisticService {
 
     @Override
     public void save(StatisticDto dto) {
-        statisticRepository.save(Mapper.ToEntity(dto));
+        statisticRepository.save(Mapper.toEntity(dto));
     }
 
     @Override

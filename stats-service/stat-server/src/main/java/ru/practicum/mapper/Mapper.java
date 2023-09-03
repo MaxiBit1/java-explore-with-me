@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 
 public class Mapper {
 
-    public static StatisticEntity ToEntity(StatisticDto statisticDto) {
+    public static StatisticEntity toEntity(StatisticDto statisticDto) {
         return StatisticEntity.builder()
                 .app(statisticDto.getApp())
                 .ip(statisticDto.getIp())
