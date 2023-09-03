@@ -34,10 +34,10 @@ public class DefaultStatisticService implements StatisticService {
                         statisticRepository.findAllByTimestampBetween(start, end);
             } else {
                 return unique ? statisticRepository.findAllByTimestampBetweenDistinct(start, end).stream()
-                        .filter(stat-> uris.contains(stat.getUri()))
+                        .filter(stat -> uris.contains(stat.getUri()))
                         .collect(Collectors.toList()) :
                         statisticRepository.findAllByTimestampBetween(start, end).stream()
-                                .filter(stat-> uris.contains(stat.getUri()))
+                                .filter(stat -> uris.contains(stat.getUri()))
                                 .collect(Collectors.toList());
             }
         } catch (DateTimeParseException e) {
