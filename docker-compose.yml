@@ -3,7 +3,7 @@ services:
   statistic-prog:
     build: ./stats-service/stat-server
     image: statistic-image
-    container_name: stats-service
+    container_name: stats-server
     depends_on:
       - stats-db
     ports:
