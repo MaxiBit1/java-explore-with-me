@@ -30,14 +30,20 @@ public class DefaultStatisticService implements StatisticService {
             LocalDateTime start = LocalDateTime.parse(startStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             LocalDateTime end = LocalDateTime.parse(endStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             if (uris == null) {
-                return unique ? statisticRepository.findAllByTimestampBetweenDistinct(start, end) :
-                        statisticRepository.findAllByTimestampBetween(start, end);
+                return unique ? statisticRepository.findAllByTimestampBetweenDistinct(start, end).stream()
+                        .sorted(((o1, o2) -> o2.getHits().compareTo(o1.getHits())))
+                        .collect(Collectors.toList()) :
+                        statisticRepository.findAllByTimestampBetween(start, end).stream()
+                                .sorted(((o1, o2) -> o2.getHits().compareTo(o1.getHits())))
+                                .collect(Collectors.toList());
             } else {
                 return unique ? statisticRepository.findAllByTimestampBetweenDistinct(start, end).stream()
                         .filter(stat -> uris.contains(stat.getUri()))
+                        .sorted(((o1, o2) -> o2.getHits().compareTo(o1.getHits())))
                         .collect(Collectors.toList()) :
                         statisticRepository.findAllByTimestampBetween(start, end).stream()
                                 .filter(stat -> uris.contains(stat.getUri()))
+                                .sorted(((o1, o2) -> o2.getHits().compareTo(o1.getHits())))
                                 .collect(Collectors.toList());
             }
         } catch (DateTimeParseException e) {
