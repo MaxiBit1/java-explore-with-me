@@ -3,6 +3,7 @@ package ru.practicum.client;
 import io.micrometer.core.lang.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import ru.practicum.dto.StatisticDto;
@@ -10,9 +11,13 @@ import ru.practicum.dto.StatisticDto;
 import java.util.List;
 import java.util.Map;
 
-@RequiredArgsConstructor
+
 public class BaseClient {
-    protected final RestTemplate restTemplate;
+    protected final RestTemplate rest;
+
+    public BaseClient(RestTemplate rest) {
+        this.rest = rest;
+    }
 
     private static ResponseEntity<Object> buildStatisticResponse(ResponseEntity<Object> response) {
         if (response.getStatusCode().is2xxSuccessful()) {
@@ -41,9 +46,9 @@ public class BaseClient {
         ResponseEntity<Object> statisticResponse;
         try {
             if (parameters != null) {
-                statisticResponse = restTemplate.exchange(path, method, requestEntity, Object.class, parameters);
+                statisticResponse = rest.exchange(path, method, requestEntity, Object.class, parameters);
             } else {
-                statisticResponse = restTemplate.exchange(path, method, requestEntity, Object.class);
+                statisticResponse = rest.exchange(path, method, requestEntity, Object.class);
             }
         } catch (HttpStatusCodeException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
@@ -56,7 +61,7 @@ public class BaseClient {
                 parameters, null);
     }
 
-    public <T> void post(StatisticDto statisticDto) {
-        makeAndSendRequest(HttpMethod.POST, "/hit", null, statisticDto);
+    public <T> ResponseEntity<Object> post(StatisticDto statisticDto) {
+        return makeAndSendRequest(HttpMethod.POST, "/hit", null, statisticDto);
     }
 }
