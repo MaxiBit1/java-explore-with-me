@@ -56,7 +56,7 @@ public class DefaultRequestService implements RequestService {
         }
 
 
-        if (event.getParticipantLimit() != 0 && event.getParticipantLimit().equals(countEvents(eventId))) {
+        if (event.getParticipantLimit() != 0 && event.getParticipantLimit() <= countEvents(eventId)) {
             throw new ConflictException("Лимит превышен");
         }
 
@@ -97,7 +97,7 @@ public class DefaultRequestService implements RequestService {
         List<RequestDto> confirmedList = new ArrayList<>();
         List<RequestDto> rejectedList = new ArrayList<>();
 
-        if (event.getParticipantLimit() != 0 && event.getParticipantLimit().equals(countEvents(eventId))) {
+        if (event.getParticipantLimit() != 0 && event.getParticipantLimit() <= countEvents(eventId)) {
             throw new ConflictException("Лимит превышен");
         }
 

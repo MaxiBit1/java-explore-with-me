@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.exception.model.BadRequestException;
+import ru.practicum.exception.model.ConflictException;
 import ru.practicum.exception.model.NotFoundException;
 import ru.practicum.user.dto.UserDtoIn;
 import ru.practicum.user.dto.UserDtoOut;
@@ -26,6 +27,12 @@ public class DefaultUserService implements UserService {
 
     @Override
     public UserDtoOut save(UserDtoIn userDtoIn) {
+        boolean check = userRepository.findAll().stream()
+                .map(User::getName)
+                .anyMatch(user -> user.equals(userDtoIn.getName()));
+        if (check) {
+            throw new ConflictException("Юзер с таким именем есть");
+        }
         return UserMapper.toUserDtoOut(userRepository.save(UserMapper.toEntity(userDtoIn)));
     }
 
