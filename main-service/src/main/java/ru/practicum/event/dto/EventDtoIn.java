@@ -5,8 +5,9 @@ import lombok.*;
 import ru.practicum.Constant;
 import ru.practicum.event.model.Location;
 
-import javax.validation.constraints.*;
-import java.time.LocalDateTime;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Getter
 @Setter

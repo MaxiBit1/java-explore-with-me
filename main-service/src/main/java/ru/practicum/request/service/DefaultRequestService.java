@@ -101,14 +101,14 @@ public class DefaultRequestService implements RequestService {
             throw new ConflictException("Лимит превышен");
         }
 
-        if(requestIds != null) {
+        if (requestIds != null) {
             requestIds.forEach(id -> {
                 Request request = requests.stream()
                         .filter(request1 -> request1.getId().equals(id)).findFirst().orElseThrow(() -> new NotFoundException(String.format("Запрос с id = %d не найден", id)));
-                if(request.getStatus().equals(StatusRequest.PENDING)) {
+                if (request.getStatus().equals(StatusRequest.PENDING)) {
                     throw new ConflictException("Запрос невозможно подтвердить.");
                 }
-                if(status.equals(StatusRequest.CONFIRMED)) {
+                if (status.equals(StatusRequest.CONFIRMED)) {
                     request.setStatus(StatusRequest.CONFIRMED);
                     confirmedList.add(RequestMapper.toDto(requestRepository.save(request)));
                 } else {

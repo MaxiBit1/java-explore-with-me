@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import ru.practicum.Constant;
-import ru.practicum.client.BaseClient;
 import ru.practicum.client.StatisticClient;
 import ru.practicum.dto.StatisticDto;
 import ru.practicum.dto.StatisticDtoEnd;

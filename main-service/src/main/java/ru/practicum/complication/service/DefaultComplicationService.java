@@ -34,7 +34,7 @@ public class DefaultComplicationService implements ComplicationService {
     @Override
     public ComplicationDtoOut save(ComplicationDtoIn complicationDtoIn) {
         List<Event> events = eventsRepository.findAllById(complicationDtoIn.getEvents() == null ? Collections.emptyList() : complicationDtoIn.getEvents());
-        if(complicationDtoIn.getPinned() == null) {
+        if (complicationDtoIn.getPinned() == null) {
             complicationDtoIn.setPinned(false);
         }
         Complication complication = complicationRepository.save(ComplicationMapper.toEntity(complicationDtoIn, events));
@@ -52,7 +52,7 @@ public class DefaultComplicationService implements ComplicationService {
     public ComplicationDtoOut updateComplication(Long complicationId, UpdateComplicationDtoIn complicationDtoIn) {
         Complication oldComplication = complicationRepository.findById(complicationId)
                 .orElseThrow(() -> new NotFoundException(String.format("Подборка с id = %d не найдена", complicationId)));
-        if(complicationDtoIn.getEvents() != null) {
+        if (complicationDtoIn.getEvents() != null) {
             oldComplication.setEvents(eventsRepository.findAllById(complicationDtoIn.getEvents()));
         }
         return setComplicationViews(oldComplication.getEvents(), oldComplication);
@@ -60,8 +60,8 @@ public class DefaultComplicationService implements ComplicationService {
 
     @Override
     public List<ComplicationDtoOut> getComplications(Boolean pinned, Integer from, Integer size) {
-        List<Complication> complications = complicationRepository.findAll(PageRequest.of(from/size, size)).getContent();
-        if(pinned != null) {
+        List<Complication> complications = complicationRepository.findAll(PageRequest.of(from / size, size)).getContent();
+        if (pinned != null) {
             complications = complications.stream()
                     .filter(Complication::getPinned)
                     .collect(Collectors.toList());

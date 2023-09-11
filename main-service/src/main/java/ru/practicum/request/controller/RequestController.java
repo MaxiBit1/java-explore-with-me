@@ -27,7 +27,7 @@ public class RequestController {
 
     @PatchMapping("/{userId}/requests/{requestId}/cancel")
     public ResponseEntity<RequestDto> updateRequest(@PathVariable Long userId,
-                                                 @PathVariable Long requestId) {
+                                                    @PathVariable Long requestId) {
         log.info("Cancel request requestId: " + requestId + " userId: " + userId);
         return new ResponseEntity<>(requestService.updateRequestStatus(userId, requestId), HttpStatus.OK);
     }

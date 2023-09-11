@@ -10,17 +10,11 @@ import ru.practicum.categories.dto.CategoryDtoOut;
 import ru.practicum.categories.mapper.CategoryMapper;
 import ru.practicum.categories.model.Category;
 import ru.practicum.categories.repository.CategoryRepository;
-import ru.practicum.event.model.Event;
-import ru.practicum.event.repository.EventsRepository;
 import ru.practicum.exception.model.BadRequestException;
 import ru.practicum.exception.model.ConflictException;
 import ru.practicum.exception.model.NotFoundException;
-import ru.practicum.user.mapper.UserMapper;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 

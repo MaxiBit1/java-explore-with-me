@@ -24,7 +24,7 @@ public interface ServiceEvent {
     List<EventDtoOutFull> getEventsAdmin(List<Long> users, List<EventState> states, List<Long> categories, LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size);
 
     List<EventDtoOutShort> getEventsPublic(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd,
-                                          Boolean onlyAvailable, String sort, Integer from, Integer size, HttpServletRequest httpServletRequest);
+                                           Boolean onlyAvailable, String sort, Integer from, Integer size, HttpServletRequest httpServletRequest);
 
     EventDtoOutFull getEventPublic(Long eventId, HttpServletRequest request);
 

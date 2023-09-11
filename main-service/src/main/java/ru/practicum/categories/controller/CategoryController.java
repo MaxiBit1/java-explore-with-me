@@ -21,8 +21,8 @@ public class CategoryController {
 
     @PostMapping("/admin/categories")
     public ResponseEntity<CategoryDtoOut> saveCategory(@RequestBody @Valid CategoryDtoIn categoryDtoIn) {
-      log.info("Category with name: " + categoryDtoIn.getName() + " saved.");
-      return new ResponseEntity<>(categoryService.saveCategory(categoryDtoIn), HttpStatus.CREATED);
+        log.info("Category with name: " + categoryDtoIn.getName() + " saved.");
+        return new ResponseEntity<>(categoryService.saveCategory(categoryDtoIn), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/admin/categories/{id}")

@@ -13,7 +13,6 @@ import ru.practicum.event.model.EventState;
 import ru.practicum.event.service.ServiceEvent;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
 import java.util.List;
 

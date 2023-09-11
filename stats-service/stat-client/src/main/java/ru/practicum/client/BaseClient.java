@@ -1,9 +1,7 @@
 package ru.practicum.client;
 
 import io.micrometer.core.lang.Nullable;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import ru.practicum.dto.StatisticDto;
@@ -39,8 +37,7 @@ public class BaseClient {
         return headers;
     }
 
-    private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path,
-                                                          @Nullable Map<String, Object> parameters, @Nullable T body) {
+    private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path, @Nullable Map<String, Object> parameters, @Nullable T body) {
         HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeader());
 
         ResponseEntity<Object> statisticResponse;
@@ -57,8 +54,7 @@ public class BaseClient {
     }
 
     public ResponseEntity<Object> get(@Nullable Map<String, Object> parameters) {
-        return makeAndSendRequest(HttpMethod.GET, "/stats?start={start}&end={end}&uris={uris}&unique={unique}",
-                parameters, null);
+        return makeAndSendRequest(HttpMethod.GET, "/stats?start={start}&end={end}&uris={uris}&unique={unique}", parameters, null);
     }
 
     public <T> ResponseEntity<Object> post(StatisticDto statisticDto) {

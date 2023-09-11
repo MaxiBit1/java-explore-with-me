@@ -12,7 +12,6 @@ import ru.practicum.event.dto.UpdateEventDtoIn;
 import ru.practicum.event.service.ServiceEvent;
 import ru.practicum.request.dto.RequestDto;
 import ru.practicum.request.dto.RequestStatusUpdateDto;
-import ru.practicum.request.model.Request;
 import ru.practicum.request.service.RequestService;
 
 import javax.validation.Valid;
@@ -58,7 +57,7 @@ public class PrivateController {
 
     @GetMapping("/{userId}/events/{eventId}/requests")
     public ResponseEntity<List<RequestDto>> getParticipationRequests(@PathVariable Long userId,
-                                                     @PathVariable Long eventId) {
+                                                                     @PathVariable Long eventId) {
         log.info("Получение информации о запросах на участие в событии текущего пользователя");
         return new ResponseEntity<>(requestService.getParticipationRequests(userId, eventId), HttpStatus.OK);
     }
@@ -66,9 +65,9 @@ public class PrivateController {
 
     @PatchMapping("/{userId}/events/{eventId}/requests")
     public ResponseEntity<RequestStatusUpdateDto> updateParticipationRequest(@PathVariable Long userId,
-                                                             @PathVariable Long eventId,
-                                                             @RequestBody EventRequestStatusUpdateDto eventRequestStatusUpdateRequestDto) {
-        log.info("Изменение статуса (подтверждена, отменена) заявок на участие в событии текущего пользователя {}",eventRequestStatusUpdateRequestDto);
+                                                                             @PathVariable Long eventId,
+                                                                             @RequestBody EventRequestStatusUpdateDto eventRequestStatusUpdateRequestDto) {
+        log.info("Изменение статуса (подтверждена, отменена) заявок на участие в событии текущего пользователя {}", eventRequestStatusUpdateRequestDto);
         return new ResponseEntity<>(requestService.updateParticipationRequest(userId, eventId, eventRequestStatusUpdateRequestDto), HttpStatus.OK);
     }
 }
