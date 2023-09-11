@@ -41,7 +41,7 @@ public class DefaultUserService implements UserService {
                 Optional<User> userOptional = userRepository.findById(id);
                 userOptional.ifPresent(idsUsers::add);
             }
-            if(idsUsers.isEmpty()) {
+            if (idsUsers.isEmpty()) {
                 return new ArrayList<>();
             }
             users = users.stream().filter(idsUsers::contains).collect(Collectors.toList());
