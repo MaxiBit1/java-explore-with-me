@@ -22,7 +22,7 @@ public class Event {
     @Column(name = "annotation")
     private String annotation;
     @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
+    @JoinColumn(name = "category_id")
     private Category category;
     @Column(name = "created_on")
     private LocalDateTime createdOn;
@@ -31,7 +31,7 @@ public class Event {
     @Column(name = "event_date")
     private LocalDateTime eventDate;
     @ManyToOne
-    @JoinColumn(name = "initiator_id", nullable = false)
+    @JoinColumn(name = "initiator_id")
     private User initiator;
     @Column(name = "is_paid")
     private Boolean paid;
