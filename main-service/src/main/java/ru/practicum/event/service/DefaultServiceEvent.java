@@ -120,65 +120,6 @@ public class DefaultServiceEvent implements ServiceEvent {
         return events;
     }
 
-//    @Override
-//    public List<EventDtoOutShort> getEventsPublic(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size, HttpServletRequest httpServletRequest) {
-//        checkStartEnd(rangeStart, rangeEnd);
-//        defaultStatClientService.createHit(httpServletRequest);
-//        List<Event> events = eventsRepository.findAllByText(text);
-//        if (categories != null) {
-//            events = events.stream()
-//                    .filter(eventDtoOutFull -> categories.contains(eventDtoOutFull.getCategory().getId()))
-//                    .collect(Collectors.toList());
-//        }
-//        if (paid != null) {
-//            events = events.stream()
-//                    .filter(eventDtoOutFull -> paid.equals(eventDtoOutFull.getPaid()))
-//                    .collect(Collectors.toList());
-//        }
-//        if (rangeStart != null && rangeEnd != null) {
-//            events = eventsRepository.findAllByText(text).stream()
-//                    .filter(event -> (
-//                            event.getEventDate().isAfter(rangeStart)
-//                                    && event.getEventDate().isBefore(rangeEnd)
-//                    ))
-//                    .collect(Collectors.toList());
-//        }
-//        List<EventDtoOutShort> eventDtos = events.stream()
-//                .map(EventMapper::toOutShort)
-//                .collect(Collectors.toList());
-//        if (onlyAvailable) {
-//            List<Long> idsConfirm = requestRepository.findAll().stream()
-//                    .filter(request -> request.getStatus().equals(StatusRequest.CONFIRMED))
-//                    .map(request -> request.getEvent().getId())
-//                    .collect(Collectors.toList());
-//            eventDtos = eventDtos.stream()
-//                    .filter(eventDtoOutShort -> idsConfirm.contains(eventDtoOutShort.getId()))
-//                    .collect(Collectors.toList());
-//
-//        }
-//        Map<Long, Long> views = defaultStatClientService.getEventsView(events);
-//        Map<Long, Long> confrimeds = getConfirmedRequests(events.stream().map(Event::getId).collect(Collectors.toList()));
-//        eventDtos.forEach(eventDtoOutShort -> {
-//                    eventDtoOutShort.setViews(views.getOrDefault(eventDtoOutShort.getId(), 0L));
-//                    eventDtoOutShort.setConfirmedRequests(confrimeds.getOrDefault(eventDtoOutShort.getId(), 0L));
-//                }
-//
-//        );
-//        if (sort != null) {
-//            switch (SortEnum.valueOf(sort)) {
-//                case EVENT_DATE:
-//                    eventDtos = eventDtos.stream().sorted(Comparator.comparing(EventDtoOutShort::getEventDate)).collect(Collectors.toList());
-//                    break;
-//                case VIEWS:
-//                    eventDtos = eventDtos.stream().sorted(Comparator.comparing(EventDtoOutShort::getViews)).collect(Collectors.toList());
-//                    break;
-//            }
-//        }
-//        Pageable pageable = PageRequest.of(from, size);
-//        int start = (int) pageable.getOffset();
-//        int end = Math.min((start + pageable.getPageSize()), eventDtos.size());
-//        return new PageImpl<>(eventDtos.subList(start, end), pageable, eventDtos.size()).getContent();
-//    }
 
     @Override
     public List<EventDtoOutShort> getEventsPublic(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size, HttpServletRequest httpServletRequest) {
