@@ -1,9 +1,7 @@
 package ru.practicum.event.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.Constant;
 import ru.practicum.categories.model.Category;
