@@ -33,7 +33,7 @@ public interface EventsRepository extends JpaRepository<Event, Long> {
             "AND (COALESCE(:categoryIds, -1) IS -1 OR e.category.id IN :categoryIds) " +
             "AND (COALESCE(:paid, FALSE) IS FALSE OR e.paid = :paid) " +
             "AND (COALESCE(:rangeStart, ' ') IS ' ' OR e.eventDate >= :rangeStart) " +
-            "AND (COALESCE(:rangeEnd, ' ') IS ' ' OR e.eventDate <= :rangeEnd) "+
+            "AND (COALESCE(:rangeEnd, ' ') IS ' ' OR e.eventDate <= :rangeEnd) " +
             "AND (:onlyAvailable = false OR e.id IN " +
             "(SELECT r.event.id " +
             "FROM Request r " +

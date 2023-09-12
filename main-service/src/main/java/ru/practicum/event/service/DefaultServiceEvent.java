@@ -108,7 +108,7 @@ public class DefaultServiceEvent implements ServiceEvent {
     @Override
     public List<EventDtoOutFull> getEventsAdmin(List<Long> users, List<EventState> states, List<Long> categories, LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size) {
         checkStartEnd(rangeStart, rangeEnd);
-        List<EventDtoOutFull> events =  eventsRepository
+        List<EventDtoOutFull> events = eventsRepository
                 .getEvents(PageRequest.of(from / size, size), users, states, categories, rangeStart, rangeEnd)
                 .stream()
                 .map(EventMapper::toOutFull)
@@ -216,6 +216,7 @@ public class DefaultServiceEvent implements ServiceEvent {
 
         return eventDtos;
     }
+
     @Override
     public EventDtoOutFull getEventPublic(Long eventId, HttpServletRequest request) {
         defaultStatClientService.createHit(request);
