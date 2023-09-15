@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.dto.StatisticDto;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -25,19 +27,37 @@ public class StatisticClient extends BaseClient {
     }
 
     public ResponseEntity<Object> postHit(StatisticDto inDto) {
-        return post(inDto);
+        return post("/hit", inDto);
     }
 
-    public ResponseEntity<Object> getStatistics(String start, String end, List<String> uris, Boolean unique) {
-        StringBuilder url = new StringBuilder();
-        for (String uri : uris) {
-            url.append("&uris=").append(uri);
+    public ResponseEntity<Object> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
+        String path = getStatisticPath(uris);
+        Map<String, Object> parameters = getStatsParameters(start, end, uris, unique);
+        return get(path, parameters);
+    }
+
+    private String getStatisticPath(List<String> uris) {
+        if (uris == null) {
+            return "/stats?start={start}&end={end}&unique={unique}";
+        } else {
+            return "/stats?start={start}&end={end}&unique={unique}&uris={uris}";
         }
-        Map<String, Object> params = Map.of(
-                "start", start,
-                "end", end,
-                "unique", unique
-        );
-        return get(params);
+    }
+
+    private Map<String, Object> getStatsParameters(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
+        if (uris == null) {
+            return Map.of(
+                    "start", start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                    "end", end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                    "unique", unique
+            );
+        } else {
+            return Map.of(
+                    "start", start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                    "end", end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                    "unique", unique,
+                    "uris", String.join(", ", uris)
+            );
+        }
     }
 }

@@ -60,14 +60,17 @@ public class DefaultComplicationService implements ComplicationService {
 
     @Override
     public List<ComplicationDtoOut> getComplications(Boolean pinned, Integer from, Integer size) {
-        List<Complication> complications = complicationRepository.findAll(PageRequest.of(from / size, size)).getContent();
-        if (pinned != null) {
-            complications = complications.stream()
-                    .filter(Complication::getPinned)
+        if (pinned == null) {
+            return complicationRepository
+                    .findAll(PageRequest.of(from / size, size))
+                    .stream()
+                    .map(complic -> setComplicationViews(complic.getEvents(), complic))
                     .collect(Collectors.toList());
         }
-        return complications.stream()
-                .map(complication -> setComplicationViews(complication.getEvents(), complication))
+        return complicationRepository
+                .findAllByPinned(pinned, PageRequest.of(from / size, size))
+                .stream()
+                .map(complic -> setComplicationViews(complic.getEvents(), complic))
                 .collect(Collectors.toList());
     }
 

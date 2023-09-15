@@ -52,7 +52,7 @@ public class DefaultStatClientService {
                 .app("ewm-main-service")
                 .timestamp(LocalDateTime.now().format(Constant.FORMATTER))
                 .build();
-        statisticClient.post(statisticDto);
+        statisticClient.postHit(statisticDto);
     }
 
     private List<Event> getPublished(List<Event> events) {
@@ -76,23 +76,12 @@ public class DefaultStatClientService {
     }
 
     private List<StatisticDtoEnd> getStatistic(LocalDateTime start, LocalDateTime end, List<String> urls, Boolean unique) {
-        Map<String, Object> parameters = getParametets(start, end, urls, unique);
-        ResponseEntity<Object> response = statisticClient.get(parameters);
+        ResponseEntity<Object> response = statisticClient.getStats(start, end, urls, unique);
         try {
             return Arrays.asList(objectMapper.readValue(objectMapper.writeValueAsString(response.getBody()), StatisticDtoEnd[].class));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e.getMessage());
         }
-    }
-
-    private Map<String, Object> getParametets(LocalDateTime start, LocalDateTime end, List<String> urls, Boolean unique) {
-        return Map.of(
-                "start", start.format(Constant.FORMATTER),
-                "end", end.format(Constant.FORMATTER),
-                "unique", unique,
-                "uris", String.join(", ", urls)
-        );
-
     }
 
 

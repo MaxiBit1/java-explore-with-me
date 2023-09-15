@@ -39,7 +39,7 @@ public class AdminController {
     @PatchMapping("/events/{eventId}")
     public ResponseEntity<EventDtoOutFull> updateAdminEvent(@PathVariable Long eventId,
                                                             @Valid @RequestBody UpdateEventDtoIn updateEventDtoIn) {
-        log.info("Update admin event: " + eventId);
+        log.info("Update admin event: " + eventId + " stateAction " + updateEventDtoIn.getStateAction());
         return new ResponseEntity<>(serviceEvent.updateEventAdmin(eventId, updateEventDtoIn), HttpStatus.OK);
     }
 }

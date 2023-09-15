@@ -14,11 +14,11 @@ public interface EventsRepository extends JpaRepository<Event, Long> {
     List<Event> findAllByInitiatorId(Long id, Pageable page);
 
     @Query("SELECT e FROM Event e " +
-            "WHERE (COALESCE(:userIds, -1) IS -1 OR e.initiator.id IN :userIds) " +
-            "AND (COALESCE(:states, ' ') IS ' ' OR e.state IN :states) " +
-            "AND (COALESCE(:categoryIds, -1) IS -1 OR e.category.id IN :categoryIds) " +
-            "AND (COALESCE(:rangeStart, ' ') IS ' ' OR e.eventDate >= :rangeStart) " +
-            "AND (COALESCE(:rangeEnd, ' ') IS ' ' OR e.eventDate <= :rangeEnd) ")
+            "WHERE (COALESCE(:userIds, NULLIF(1,1) ) IS NULL OR e.initiator.id IN :userIds) " +
+            "AND (COALESCE(:states, ' ' ) IS ' ' OR e.state IN :states) " +
+            "AND (COALESCE(:categoryIds, NULLIF(1,1) ) IS NULL OR e.category.id IN :categoryIds) " +
+            "AND (COALESCE(:rangeStart, ' ' ) IS ' ' OR e.eventDate >= :rangeStart) " +
+            "AND (COALESCE(:rangeEnd, ' ' ) IS ' ' OR e.eventDate <= :rangeEnd) ")
     List<Event> getEvents(Pageable pageable,
                           @Param("userIds") List<Long> userIds,
                           @Param("states") List<EventState> states,
@@ -29,11 +29,11 @@ public interface EventsRepository extends JpaRepository<Event, Long> {
 
     @Query("SELECT e FROM Event e " +
             "WHERE e.state = 'PUBLISHED' " +
-            "AND (COALESCE(:text, ' ') IS ' ' OR (LOWER(e.annotation) LIKE LOWER(concat('%', :text, '%')) OR LOWER(e.description) LIKE LOWER(concat('%', :text, '%')))) " +
-            "AND (COALESCE(:categoryIds, -1) IS -1 OR e.category.id IN :categoryIds) " +
+            "AND (COALESCE(:text, ' ' ) IS ' ' OR (LOWER(e.annotation) LIKE LOWER(concat('%', :text, '%')) OR LOWER(e.description) LIKE LOWER(concat('%', :text, '%')))) " +
+            "AND (COALESCE(:categoryIds, NULLIF(1,1) ) IS NULL OR e.category.id IN :categoryIds) " +
             "AND (COALESCE(:paid, FALSE) IS FALSE OR e.paid = :paid) " +
-            "AND (COALESCE(:rangeStart, ' ') IS ' ' OR e.eventDate >= :rangeStart) " +
-            "AND (COALESCE(:rangeEnd, ' ') IS ' ' OR e.eventDate <= :rangeEnd) " +
+            "AND (COALESCE(:rangeStart, ' ' ) IS ' ' OR e.eventDate >= :rangeStart) " +
+            "AND (COALESCE(:rangeEnd, ' ' ) IS ' ' OR e.eventDate <= :rangeEnd) " +
             "AND (:onlyAvailable = false OR e.id IN " +
             "(SELECT r.event.id " +
             "FROM Request r " +

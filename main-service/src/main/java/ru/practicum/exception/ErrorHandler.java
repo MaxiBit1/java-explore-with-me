@@ -45,7 +45,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<Object> handleConflictException(final ConflictException e) {
-        log.error("Conflict exception.");
+        log.error("Conflict exception." + e.getMessage());
         return responseEntity(new Error(HttpStatus.CONFLICT, "Запрос противоречит установленным ограничениям.",
                 e.getMessage(), LocalDateTime.now()));
     }
@@ -58,13 +58,13 @@ public class ErrorHandler {
                 e.getMessage(), LocalDateTime.now()));
     }
 
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    @ExceptionHandler(Throwable.class)
-//    public ResponseEntity<Object> handleException(Throwable e) {
-//        log.error("Internal server error.");
-//        return responseEntity(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, "Недопустимый запрос.",
-//                e.getMessage(), LocalDateTime.now()));
-//    }
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(Throwable.class)
+    public ResponseEntity<Object> handleException(Throwable e) {
+        log.error("Internal server error.");
+        return responseEntity(new Error(HttpStatus.INTERNAL_SERVER_ERROR, "Недопустимый запрос.",
+                e.getMessage(), LocalDateTime.now()));
+    }
 
     private ResponseEntity<Object> responseEntity(Error apiError) {
         return new ResponseEntity<>(apiError, apiError.getStatus());

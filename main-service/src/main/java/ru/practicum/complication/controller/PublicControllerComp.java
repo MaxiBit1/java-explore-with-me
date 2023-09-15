@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.complication.dto.ComplicationDtoOut;
 import ru.practicum.complication.service.ComplicationService;
 
-import javax.validation.constraints.Min;
 import java.util.List;
 
 @RestController
@@ -22,8 +21,8 @@ public class PublicControllerComp {
 
     @GetMapping
     public ResponseEntity<List<ComplicationDtoOut>> getComlications(@RequestParam(required = false) boolean pinned,
-                                                                    @RequestParam(value = "from", defaultValue = "0") @Min(0) Integer from,
-                                                                    @RequestParam(value = "size", defaultValue = "10") @Min(1) Integer size) {
+                                                                    @RequestParam(value = "from", defaultValue = "0") Integer from,
+                                                                    @RequestParam(value = "size", defaultValue = "10") Integer size) {
         log.info("Get complications from: " + from + " size: " + size + " pinned: " + pinned);
         return new ResponseEntity<>(complicationService.getComplications(pinned, from, size), HttpStatus.OK);
     }

@@ -1,6 +1,7 @@
 package ru.practicum.event.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.Constant;
@@ -14,8 +15,6 @@ import ru.practicum.event.repository.EventsRepository;
 import ru.practicum.exception.model.BadRequestException;
 import ru.practicum.exception.model.ConflictException;
 import ru.practicum.exception.model.NotFoundException;
-import ru.practicum.request.model.Request;
-import ru.practicum.request.model.StatusRequest;
 import ru.practicum.request.repository.RequestRepository;
 import ru.practicum.user.model.User;
 import ru.practicum.user.repository.UserRepository;
@@ -28,6 +27,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class DefaultServiceEvent implements ServiceEvent {
 
     private final EventsRepository eventsRepository;
@@ -106,18 +106,18 @@ public class DefaultServiceEvent implements ServiceEvent {
     @Override
     public List<EventDtoOutFull> getEventsAdmin(List<Long> users, List<EventState> states, List<Long> categories, LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from, Integer size) {
         checkStartEnd(rangeStart, rangeEnd);
-        List<EventDtoOutFull> events = eventsRepository
-                .getEvents(PageRequest.of(from / size, size), users, states, categories, rangeStart, rangeEnd)
-                .stream()
+        List<Event> events = eventsRepository
+                .getEvents(PageRequest.of(from / size, size), users, states, categories, rangeStart, rangeEnd);
+        Map<Long, Long> confrimeds = getConfirmedRequests(events);
+        List<EventDtoOutFull> eventDtoOutFulls = events.stream()
                 .map(EventMapper::toOutFull)
                 .collect(Collectors.toList());
-        Map<Long, Long> confrimeds = getConfirmedRequests(events.stream().map(EventDtoOutFull::getId).collect(Collectors.toList()));
-        events.forEach(eventDtoOutFull -> {
+        eventDtoOutFulls.forEach(eventDtoOutFull -> {
                     eventDtoOutFull.setConfirmedRequests(confrimeds.getOrDefault(eventDtoOutFull.getId(), 0L));
                 }
 
         );
-        return events;
+        return eventDtoOutFulls;
     }
 
 
@@ -135,7 +135,7 @@ public class DefaultServiceEvent implements ServiceEvent {
                 .collect(Collectors.toList());
 
         Map<Long, Long> views = defaultStatClientService.getEventsView(events);
-        Map<Long, Long> confrimeds = getConfirmedRequests(events.stream().map(Event::getId).collect(Collectors.toList()));
+        Map<Long, Long> confrimeds = getConfirmedRequests(events);
         eventDtos.forEach(eventDtoOutShort -> {
                     eventDtoOutShort.setViews(views.getOrDefault(eventDtoOutShort.getId(), 0L));
                     eventDtoOutShort.setConfirmedRequests(confrimeds.getOrDefault(eventDtoOutShort.getId(), 0L));
@@ -165,7 +165,7 @@ public class DefaultServiceEvent implements ServiceEvent {
         }
         EventDtoOutFull eventDtoOutFull = EventMapper.toOutFull(event);
         Map<Long, Long> views = defaultStatClientService.getEventsView(List.of(event));
-        Map<Long, Long> confrimeds = getConfirmedRequests(List.of(event.getId()));
+        Map<Long, Long> confrimeds = getConfirmedRequests(List.of(event));
         eventDtoOutFull.setViews(views.getOrDefault(eventId, 0L));
         eventDtoOutFull.setConfirmedRequests(confrimeds.getOrDefault(eventId, 0L));
         return eventDtoOutFull;
@@ -199,11 +199,14 @@ public class DefaultServiceEvent implements ServiceEvent {
             checkTimeEvent(oldEvent);
         }
         if (updateEventDtoIn.getStateAction() != null) {
+            log.info("Step 1 oldEvent state = " + oldEvent.getState());
             switch (updateEventDtoIn.getStateAction()) {
                 case PUBLISH_EVENT:
                     if (oldEvent.getState().equals(EventState.PENDING)) {
+                        log.info("Step 2 oldEvent state = " + oldEvent.getState());
                         oldEvent.setState(EventState.PUBLISHED);
                         oldEvent.setPublishedOn(LocalDateTime.now());
+                        log.info("Step 3 oldEvent state = " + oldEvent.getState());
                     } else {
                         throw new ConflictException("Событие можно публиковать, только если оно в состоянии ожидания.");
                     }
@@ -255,17 +258,20 @@ public class DefaultServiceEvent implements ServiceEvent {
         }
     }
 
-    private Map<Long, Long> getConfirmedRequests(List<Long> eventsId) {
-        List<Request> confirmedRequests = requestRepository.findAll().stream()
-                .filter(request -> request.getStatus().equals(StatusRequest.CONFIRMED)
-                        && eventsId.contains(request.getEvent().getId()))
+    private Map<Long, Long> getConfirmedRequests(List<Event> eventsId) {
+        List<Event> perEvents = eventsId.stream()
+                .filter(event -> event.getPublishedOn() != null)
+                .collect(Collectors.toList());
+        List<Long> confirmedRequests = perEvents.stream()
+                .map(Event::getId)
                 .collect(Collectors.toList());
 
-        return confirmedRequests.stream()
-                .collect(Collectors.groupingBy(request -> request.getEvent().getId()))
-                .entrySet()
-                .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> (long) e.getValue().size()));
+        Map<Long, Long> requestStats = new HashMap<>();
+        if (!eventsId.isEmpty()) {
+            requestRepository.findConfirmedRequests(confirmedRequests)
+                    .forEach(stat -> requestStats.put(stat.getEventId(), stat.getConfirmedRequests()));
+        }
+        return requestStats;
     }
 }
 

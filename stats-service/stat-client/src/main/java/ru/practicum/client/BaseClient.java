@@ -4,7 +4,6 @@ import io.micrometer.core.lang.Nullable;
 import org.springframework.http.*;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-import ru.practicum.dto.StatisticDto;
 
 import java.util.List;
 import java.util.Map;
@@ -53,11 +52,15 @@ public class BaseClient {
         return buildStatisticResponse(statisticResponse);
     }
 
-    public ResponseEntity<Object> get(@Nullable Map<String, Object> parameters) {
-        return makeAndSendRequest(HttpMethod.GET, "/stats?start={start}&end={end}&uris={uris}&unique={unique}", parameters, null);
+    protected ResponseEntity<Object> get(String path, @Nullable Map<String, Object> parameters) {
+        return makeAndSendRequest(HttpMethod.GET, path, parameters, null);
     }
 
-    public <T> ResponseEntity<Object> post(StatisticDto statisticDto) {
-        return makeAndSendRequest(HttpMethod.POST, "/hit", null, statisticDto);
+    protected <T> ResponseEntity<Object> post(String path, T body) {
+        return post(path, null, body);
+    }
+
+    protected <T> ResponseEntity<Object> post(String path, @Nullable Map<String, Object> parameters, T body) {
+        return makeAndSendRequest(HttpMethod.POST, path, parameters, body);
     }
 }

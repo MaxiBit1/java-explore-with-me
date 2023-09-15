@@ -19,21 +19,21 @@ public class RequestController {
     private final RequestService requestService;
 
     @PostMapping("/{userId}/requests")
-    public ResponseEntity<RequestDto> createRequest(@PathVariable Long userId,
+    public ResponseEntity<RequestDto> createRequest(@PathVariable("userId") Long userId,
                                                     @RequestParam Long eventId) {
         log.info("Add request userId: " + userId + " eventID: " + eventId);
         return new ResponseEntity<>(requestService.createRequest(userId, eventId), HttpStatus.CREATED);
     }
 
     @PatchMapping("/{userId}/requests/{requestId}/cancel")
-    public ResponseEntity<RequestDto> updateRequest(@PathVariable Long userId,
-                                                    @PathVariable Long requestId) {
+    public ResponseEntity<RequestDto> updateRequest(@PathVariable("userId") Long userId,
+                                                    @PathVariable("requestId") Long requestId) {
         log.info("Cancel request requestId: " + requestId + " userId: " + userId);
         return new ResponseEntity<>(requestService.updateRequestStatus(userId, requestId), HttpStatus.OK);
     }
 
     @GetMapping("/{userId}/requests")
-    public ResponseEntity<List<RequestDto>> getRequestsByUser(@PathVariable Long userId) {
+    public ResponseEntity<List<RequestDto>> getRequestsByUser(@PathVariable("userId") Long userId) {
         log.info("Get request by current user with strangers events");
         return new ResponseEntity<>(requestService.getRequestsByUser(userId), HttpStatus.OK);
     }

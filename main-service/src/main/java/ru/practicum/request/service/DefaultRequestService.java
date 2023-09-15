@@ -1,6 +1,7 @@
 package ru.practicum.request.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.event.dto.EventRequestStatusUpdateDto;
 import ru.practicum.event.model.Event;
@@ -22,11 +23,11 @@ import ru.practicum.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DefaultRequestService implements RequestService {
 
     private final RequestRepository requestRepository;
@@ -40,7 +41,7 @@ public class DefaultRequestService implements RequestService {
         if (eventId == null || userId == null) {
             throw new BadRequestException("Id события и/или пользователя не должно быть равно нулю");
         }
-        if (requestRepository.findAllByRequester_IdAndEvent_Id(userId, eventId) != null) {
+        if (requestRepository.findByRequester_IdAndEvent_Id(userId, eventId) != null) {
             throw new ConflictException("Нельзя добавить повторный запрос.");
         }
 
@@ -56,7 +57,7 @@ public class DefaultRequestService implements RequestService {
         }
 
 
-        if (event.getParticipantLimit() != 0 && event.getParticipantLimit() <= countEvents(eventId)) {
+        if (event.getParticipantLimit() != 0 && event.getParticipantLimit() <= requestRepository.countAllByEventIdAndStatus(eventId, StatusRequest.CONFIRMED)) {
             throw new ConflictException("Лимит превышен");
         }
 
@@ -64,6 +65,8 @@ public class DefaultRequestService implements RequestService {
         request.setCreated(LocalDateTime.now());
         request.setRequester(user);
         request.setEvent(event);
+
+        log.info("request Moderation" + event.getRequestModeration());
 
         if (event.getRequestModeration().equals(true) && event.getParticipantLimit() > 0) {
             request.setStatus(StatusRequest.PENDING);
@@ -75,8 +78,8 @@ public class DefaultRequestService implements RequestService {
 
     @Override
     public List<RequestDto> getParticipationRequests(Long userId, Long eventId) {
-        return requestRepository.findAll().stream()
-                .filter(request -> request.getRequester().getId().equals(userId) && request.getEvent().getId().equals(eventId))
+
+        return requestRepository.findAllByEvent_Initiator_IdAndEvent_Id(userId, eventId).stream()
                 .map(RequestMapper::toDto)
                 .collect(Collectors.toList());
     }
@@ -97,7 +100,7 @@ public class DefaultRequestService implements RequestService {
         List<RequestDto> confirmedList = new ArrayList<>();
         List<RequestDto> rejectedList = new ArrayList<>();
 
-        if (event.getParticipantLimit() != 0 && event.getParticipantLimit() <= countEvents(eventId)) {
+        if (event.getParticipantLimit() != 0 && event.getParticipantLimit() <= requestRepository.countAllByEventIdAndStatus(eventId, StatusRequest.CONFIRMED)) {
             throw new ConflictException("Лимит превышен");
         }
 
@@ -105,7 +108,7 @@ public class DefaultRequestService implements RequestService {
             requestIds.forEach(id -> {
                 Request request = requests.stream()
                         .filter(request1 -> request1.getId().equals(id)).findFirst().orElseThrow(() -> new NotFoundException(String.format("Запрос с id = %d не найден", id)));
-                if (request.getStatus().equals(StatusRequest.PENDING)) {
+                if (!request.getStatus().equals(StatusRequest.PENDING)) {
                     throw new ConflictException("Запрос невозможно подтвердить.");
                 }
                 if (status.equals(StatusRequest.CONFIRMED)) {
@@ -139,10 +142,4 @@ public class DefaultRequestService implements RequestService {
                 .collect(Collectors.toList());
     }
 
-    private int countEvents(Long eventId) {
-        return (int) requestRepository.findAll().stream()
-                .filter(request -> Objects.equals(request.getEvent().getId(), eventId)
-                        && request.getStatus() == StatusRequest.CONFIRMED)
-                .count();
-    }
 }
