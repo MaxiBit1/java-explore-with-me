@@ -20,7 +20,7 @@ public class RequestController {
 
     @PostMapping("/{userId}/requests")
     public ResponseEntity<RequestDto> createRequest(@PathVariable("userId") Long userId,
-                                                    @RequestParam Long eventId) {
+                                                    @RequestParam(required = false) Long eventId) {
         log.info("Add request userId: " + userId + " eventID: " + eventId);
         return new ResponseEntity<>(requestService.createRequest(userId, eventId), HttpStatus.CREATED);
     }

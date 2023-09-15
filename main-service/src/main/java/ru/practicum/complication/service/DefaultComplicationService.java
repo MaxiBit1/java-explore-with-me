@@ -1,6 +1,7 @@
 package ru.practicum.complication.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.complication.dto.ComplicationDtoIn;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DefaultComplicationService implements ComplicationService {
 
     private final ComplicationRepository complicationRepository;
@@ -55,6 +57,7 @@ public class DefaultComplicationService implements ComplicationService {
         if (complicationDtoIn.getEvents() != null) {
             oldComplication.setEvents(eventsRepository.findAllById(complicationDtoIn.getEvents()));
         }
+        complicationRepository.save(oldComplication);
         return setComplicationViews(oldComplication.getEvents(), oldComplication);
     }
 
@@ -83,6 +86,7 @@ public class DefaultComplicationService implements ComplicationService {
 
     private ComplicationDtoOut setComplicationViews(List<Event> events, Complication complication) {
         List<EventDtoOutFull> eventFills = new ArrayList<>();
+        log.info("events: " + events.size());
         if (!events.isEmpty()) {
             Map<Long, Long> views = defaultStatClientService.getEventsView(events);
             eventFills = events.stream()
