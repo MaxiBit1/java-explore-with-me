@@ -9,7 +9,6 @@ import ru.practicum.exception.model.BadRequest;
 import ru.practicum.exception.model.ErrorResponse;
 
 import javax.validation.ValidationException;
-import java.time.format.DateTimeParseException;
 
 @RestControllerAdvice
 @Slf4j
