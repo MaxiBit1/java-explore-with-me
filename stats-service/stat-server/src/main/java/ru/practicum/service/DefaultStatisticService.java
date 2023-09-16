@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.StatisticDto;
 import ru.practicum.dto.StatisticDtoEnd;
+import ru.practicum.exception.model.BadRequest;
 import ru.practicum.mapper.Mapper;
 import ru.practicum.repository.StatisticRepository;
 
@@ -26,9 +27,15 @@ public class DefaultStatisticService implements StatisticService {
 
     @Override
     public List<StatisticDtoEnd> getStats(String startStr, String endStr, List<String> uris, Boolean unique) {
+        if (startStr.equals("0") || endStr.equals("0")) {
+            throw new BadRequest("Time not null");
+        }
         try {
             LocalDateTime start = LocalDateTime.parse(startStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             LocalDateTime end = LocalDateTime.parse(endStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            if (end.isBefore(start)) {
+                throw new BadRequest("End not be before start");
+            }
             if (uris == null) {
                 return unique ? statisticRepository.findAllByTimestampBetweenDistinct(start, end).stream()
                         .sorted(((o1, o2) -> o2.getHits().compareTo(o1.getHits())))

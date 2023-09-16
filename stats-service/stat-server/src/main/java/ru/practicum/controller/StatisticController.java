@@ -29,8 +29,8 @@ public class StatisticController {
     }
 
     @GetMapping("/stats")
-    public ResponseEntity<List<StatisticDtoEnd>> getStatistic(@RequestParam("start") String start,
-                                                              @RequestParam("end") String end,
+    public ResponseEntity<List<StatisticDtoEnd>> getStatistic(@RequestParam(value = "start", defaultValue = "0") String start,
+                                                              @RequestParam(value = "end", defaultValue = "0") String end,
                                                               @RequestParam(value = "uris", required = false) List<String> uris,
                                                               @RequestParam(value = "unique", defaultValue = "false") Boolean unique) {
         log.info("Get statistics");

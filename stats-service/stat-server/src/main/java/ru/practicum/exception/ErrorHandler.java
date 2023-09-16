@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.practicum.exception.model.BadRequest;
 import ru.practicum.exception.model.ErrorResponse;
 
 import javax.validation.ValidationException;
@@ -22,7 +23,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse runtimeException(final RuntimeException e) {
+    public ErrorResponse runtimeException(final BadRequest e) {
         log.error(e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
