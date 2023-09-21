@@ -1,6 +1,7 @@
 package ru.practicum.event.repository;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -45,5 +46,8 @@ public interface EventsRepository extends JpaRepository<Event, Long> {
                             @Param("categoryIds") List<Long> categoryIds,
                             @Param("paid") Boolean paid, @Param("rangeStart") LocalDateTime rangeStart,
                             @Param("rangeEnd") LocalDateTime rangeEnd, @Param("onlyAvailable") Boolean onlyAvailable, Pageable pageable);
+    List<Event> findAllByInitiatorIdAndState(Long id, EventState state, Pageable page);
+
+    List<Event> findAllByStateAndInitiatorIdIn(EventState state, List<Long> followers, Pageable page);
 
 }

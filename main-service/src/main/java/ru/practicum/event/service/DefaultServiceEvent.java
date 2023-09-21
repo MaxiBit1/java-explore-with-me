@@ -11,6 +11,7 @@ import ru.practicum.event.dto.*;
 import ru.practicum.event.mapper.EventMapper;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.EventState;
+import ru.practicum.event.model.FollowSort;
 import ru.practicum.event.repository.EventsRepository;
 import ru.practicum.exception.model.BadRequestException;
 import ru.practicum.exception.model.ConflictException;
@@ -171,6 +172,67 @@ public class DefaultServiceEvent implements ServiceEvent {
         return eventDtoOutFull;
     }
 
+    @Override
+    public List<EventDtoOutFull> getFollowEventsById(Long userId, Long followerId, String sort, Integer from, Integer size) {
+
+        if (size <= 0 || from < 0) {
+            throw new BadRequestException("From и size не могут быть меньше 0");
+        }
+        if (userId.equals(followerId)) {
+            throw new ConflictException("Пользователь не может быть подписан сам на себя");
+        }
+        User user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new NotFoundException(String.format("Пользователь с id = %d не найден", userId)));
+        User follower = userRepository
+                .findById(followerId)
+                .orElseThrow(() -> new NotFoundException(String.format("Пользователь с id = %d не найден", userId)));
+
+        if (!user.getFollower().contains(follower)) {
+            throw new ConflictException("Пользователь не подписан на пользователя");
+        }
+        List<Event> events;
+        if (FollowSort.valueOf(sort).equals(FollowSort.NEW)) {
+            events = eventsRepository.findAllByInitiatorIdAndState(followerId, EventState.PUBLISHED, PageRequest.of(from / size, size)).stream()
+                    .sorted(((o1, o2) -> o2.getEventDate().compareTo(o1.getEventDate())))
+                    .collect(Collectors.toList());
+        } else {
+            events = eventsRepository.findAllByInitiatorIdAndState(followerId, EventState.PUBLISHED, PageRequest.of(from / size, size)).stream()
+                    .sorted((Comparator.comparing(Event::getEventDate)))
+                    .collect(Collectors.toList());
+        }
+        List<EventDtoOutFull> eventDtos = events.stream().map(EventMapper::toOutFull).collect(Collectors.toList());
+        setViewsAndConfirmes(events, eventDtos);
+        return eventDtos;
+    }
+
+    @Override
+    public List<EventDtoOutFull> getFollowEvents(Long userId, String sort, Integer from, Integer size) {
+        if (size <= 0 || from < 0) {
+            throw new BadRequestException("From и size не могут быть меньше 0");
+        }
+        User user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new NotFoundException(String.format("Пользователь с id = %d не найден", userId)));
+        if (user.getFollow().isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<Long> followers = user.getFollow().stream().map(User::getId).collect(Collectors.toList());
+        List<Event> events;
+        if (FollowSort.valueOf(sort).equals(FollowSort.NEW)) {
+            events = eventsRepository.findAllByStateAndInitiatorIdIn(EventState.PUBLISHED, followers, PageRequest.of(from / size, size)).stream()
+                    .sorted(((o1, o2) -> o2.getEventDate().compareTo(o1.getEventDate())))
+                    .collect(Collectors.toList());
+        } else {
+            events = eventsRepository.findAllByStateAndInitiatorIdIn(EventState.PUBLISHED, followers, PageRequest.of(from / size, size)).stream()
+                    .sorted((Comparator.comparing(Event::getEventDate)))
+                    .collect(Collectors.toList());
+        }
+        List<EventDtoOutFull> eventDtos = events.stream().map(EventMapper::toOutFull).collect(Collectors.toList());
+        setViewsAndConfirmes(events, eventDtos);
+        return eventDtos;
+    }
+
     private void checkEvent(EventDtoIn eventDtoIn) {
         if (eventDtoIn.getPaid() == null) {
             eventDtoIn.setPaid(false);
@@ -272,6 +334,18 @@ public class DefaultServiceEvent implements ServiceEvent {
                     .forEach(stat -> requestStats.put(stat.getEventId(), stat.getConfirmedRequests()));
         }
         return requestStats;
+    }
+
+    private void setViewsAndConfirmes(List<Event> events, List<EventDtoOutFull> eventDtos) {
+        log.info("view");
+        Map<Long, Long> views = defaultStatClientService.getEventsView(events);
+        Map<Long, Long> confrimeds = getConfirmedRequests(events);
+        eventDtos.forEach(eventDtoOutShort -> {
+                    eventDtoOutShort.setViews(views.getOrDefault(eventDtoOutShort.getId(), 0L));
+                    eventDtoOutShort.setConfirmedRequests(confrimeds.getOrDefault(eventDtoOutShort.getId(), 0L));
+                }
+
+        );
     }
 }
 

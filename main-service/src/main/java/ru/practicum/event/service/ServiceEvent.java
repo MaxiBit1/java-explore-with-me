@@ -28,6 +28,10 @@ public interface ServiceEvent {
 
     EventDtoOutFull getEventPublic(Long eventId, HttpServletRequest request);
 
+    List<EventDtoOutFull> getFollowEventsById(Long userId, Long followerId, String sort, Integer from, Integer size);
+
+    List<EventDtoOutFull> getFollowEvents(Long userId, String sort, Integer from, Integer size);
+
 
 }
 

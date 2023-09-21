@@ -10,6 +10,7 @@ import ru.practicum.exception.model.ConflictException;
 import ru.practicum.exception.model.NotFoundException;
 import ru.practicum.user.dto.UserDtoIn;
 import ru.practicum.user.dto.UserDtoOut;
+import ru.practicum.user.dto.UserDtoWithFollowers;
 import ru.practicum.user.mapper.UserMapper;
 import ru.practicum.user.model.User;
 import ru.practicum.user.repository.UserRepository;
@@ -67,5 +68,39 @@ public class DefaultUserService implements UserService {
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("Пользователь с id = %d не найден", id)));
         userRepository.delete(user);
+    }
+
+    @Override
+    public UserDtoWithFollowers addFollow(Long userId, Long followerId) {
+        checkFollower(userId, followerId);
+
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(String.format("Пользователь с id = %d не найден", userId)));
+        User follower = userRepository.findById(followerId).orElseThrow(() -> new NotFoundException(String.format("Пользователь с id = %d не найден", followerId)));
+
+        if (user.getFollower().contains(follower)) {
+            throw new ConflictException("Пользователь уже подписан");
+        }
+        user.getFollower().add(follower);
+        return UserMapper.toUserFollowers(userRepository.save(user));
+    }
+
+    @Override
+    public void deleteFollow(Long userId, Long followerId) {
+        checkFollower(userId, followerId);
+
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(String.format("Пользователь с id = %d не найден", userId)));
+        User follower = userRepository.findById(followerId).orElseThrow(() -> new NotFoundException(String.format("Пользователь с id = %d не найден", followerId)));
+
+        if (!user.getFollower().contains(follower)) {
+            throw new ConflictException("Пользователь не подписан");
+        }
+        user.getFollower().remove(follower);
+        userRepository.save(user);
+    }
+
+    private void checkFollower(Long userId, Long followerId) {
+        if (userId.equals(followerId)) {
+            throw new ConflictException("Пользователь не может подписаться на себя же");
+        }
     }
 }

@@ -58,7 +58,7 @@ public class PrivateController {
     @GetMapping("/{userId}/events/{eventId}/requests")
     public ResponseEntity<List<RequestDto>> getParticipationRequests(@PathVariable Long userId,
                                                                      @PathVariable Long eventId) {
-        log.info("Получение информации о запросах на участие в событии текущего пользователя");
+        log.info("Get information about request event");
         return new ResponseEntity<>(requestService.getParticipationRequests(userId, eventId), HttpStatus.OK);
     }
 
@@ -67,7 +67,26 @@ public class PrivateController {
     public ResponseEntity<RequestStatusUpdateDto> updateParticipationRequest(@PathVariable Long userId,
                                                                              @PathVariable Long eventId,
                                                                              @RequestBody EventRequestStatusUpdateDto eventRequestStatusUpdateRequestDto) {
-        log.info("Изменение статуса (подтверждена, отменена) заявок на участие в событии текущего пользователя {}", eventRequestStatusUpdateRequestDto);
+        log.info("Change status request");
         return new ResponseEntity<>(requestService.updateParticipationRequest(userId, eventId, eventRequestStatusUpdateRequestDto), HttpStatus.OK);
+    }
+
+    @GetMapping("/{userId}/followers/{followerId}/events")
+    public ResponseEntity<List<EventDtoOutFull>> findEventsByFollowOfUser(@PathVariable Long userId,
+                                                                          @PathVariable Long followerId,
+                                                                          @RequestParam(required = false, defaultValue = "NEW") String sort,
+                                                                          @RequestParam(required = false, defaultValue = "0") Integer from,
+                                                                          @RequestParam(required = false, defaultValue = "10") Integer size) {
+        log.info("Get follow by follower: " + followerId + " UserID: " + userId);
+        return new ResponseEntity<>(serviceEvent.getFollowEventsById(userId, followerId, sort, from, size), HttpStatus.OK);
+    }
+
+    @GetMapping("/followers/{followerId}/events")
+    public ResponseEntity<List<EventDtoOutFull>> findEventsByAllFollows(@PathVariable Long followerId,
+                                                                        @RequestParam(required = false, defaultValue = "NEW") String sort,
+                                                                        @RequestParam(required = false, defaultValue = "0") Integer from,
+                                                                        @RequestParam(required = false, defaultValue = "10") Integer size) {
+        log.info("Get all follow by follower: " + followerId);
+        return new ResponseEntity<>(serviceEvent.getFollowEvents(followerId, sort, from, size), HttpStatus.OK);
     }
 }
