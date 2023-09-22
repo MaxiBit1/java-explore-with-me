@@ -174,7 +174,6 @@ public class DefaultServiceEvent implements ServiceEvent {
 
     @Override
     public List<EventDtoOutFull> getFollowEventsById(Long userId, Long followerId, String sort, Integer from, Integer size) {
-
         if (size <= 0 || from < 0) {
             throw new BadRequestException("From и size не могут быть меньше 0");
         }
@@ -186,21 +185,13 @@ public class DefaultServiceEvent implements ServiceEvent {
                 .orElseThrow(() -> new NotFoundException(String.format("Пользователь с id = %d не найден", userId)));
         User follower = userRepository
                 .findById(followerId)
-                .orElseThrow(() -> new NotFoundException(String.format("Пользователь с id = %d не найден", userId)));
+                .orElseThrow(() -> new NotFoundException(String.format("Подписанный пользователь с id = %d не найден", followerId)));
 
         if (!user.getFollower().contains(follower)) {
             throw new ConflictException("Пользователь не подписан на пользователя");
         }
-        List<Event> events;
-        if (FollowSort.valueOf(sort).equals(FollowSort.NEW)) {
-            events = eventsRepository.findAllByInitiatorIdAndState(followerId, EventState.PUBLISHED, PageRequest.of(from / size, size)).stream()
-                    .sorted(((o1, o2) -> o2.getEventDate().compareTo(o1.getEventDate())))
-                    .collect(Collectors.toList());
-        } else {
-            events = eventsRepository.findAllByInitiatorIdAndState(followerId, EventState.PUBLISHED, PageRequest.of(from / size, size)).stream()
-                    .sorted((Comparator.comparing(Event::getEventDate)))
-                    .collect(Collectors.toList());
-        }
+        List<Event> events = eventsRepository.findAllByInitiatorIdAndState(followerId, EventState.PUBLISHED, PageRequest.of(from / size, size));
+        events = getSortedFollowerEvents(events, sort);
         List<EventDtoOutFull> eventDtos = events.stream().map(EventMapper::toOutFull).collect(Collectors.toList());
         setViewsAndConfirmes(events, eventDtos);
         return eventDtos;
@@ -218,16 +209,8 @@ public class DefaultServiceEvent implements ServiceEvent {
             return new ArrayList<>();
         }
         List<Long> followers = user.getFollow().stream().map(User::getId).collect(Collectors.toList());
-        List<Event> events;
-        if (FollowSort.valueOf(sort).equals(FollowSort.NEW)) {
-            events = eventsRepository.findAllByStateAndInitiatorIdIn(EventState.PUBLISHED, followers, PageRequest.of(from / size, size)).stream()
-                    .sorted(((o1, o2) -> o2.getEventDate().compareTo(o1.getEventDate())))
-                    .collect(Collectors.toList());
-        } else {
-            events = eventsRepository.findAllByStateAndInitiatorIdIn(EventState.PUBLISHED, followers, PageRequest.of(from / size, size)).stream()
-                    .sorted((Comparator.comparing(Event::getEventDate)))
-                    .collect(Collectors.toList());
-        }
+        List<Event> events = eventsRepository.findAllByStateAndInitiatorIdIn(EventState.PUBLISHED, followers, PageRequest.of(from / size, size));
+        events = getSortedFollowerEvents(events, sort);
         List<EventDtoOutFull> eventDtos = events.stream().map(EventMapper::toOutFull).collect(Collectors.toList());
         setViewsAndConfirmes(events, eventDtos);
         return eventDtos;
@@ -346,6 +329,18 @@ public class DefaultServiceEvent implements ServiceEvent {
                 }
 
         );
+    }
+
+    private List<Event> getSortedFollowerEvents(List<Event> events, String sort) {
+        Comparator<Event> comparator = (o1, o2) -> o2.getEventDate().compareTo(o1.getEventDate());
+        if (FollowSort.valueOf(sort).equals(FollowSort.NEW)) {
+            return events.stream()
+                    .sorted(comparator)
+                    .collect(Collectors.toList());
+        }
+        return events.stream()
+                .sorted(comparator.reversed())
+                .collect(Collectors.toList());
     }
 }
 
