@@ -1,2 +1,2 @@
-# java-explore-with-me
-Template repository for ExploreWithMe project.
+# Pull Request
+https://github.com/MaxiBit1/java-explore-with-me/pull/6

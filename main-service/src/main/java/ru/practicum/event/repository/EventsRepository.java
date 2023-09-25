@@ -46,4 +46,8 @@ public interface EventsRepository extends JpaRepository<Event, Long> {
                             @Param("paid") Boolean paid, @Param("rangeStart") LocalDateTime rangeStart,
                             @Param("rangeEnd") LocalDateTime rangeEnd, @Param("onlyAvailable") Boolean onlyAvailable, Pageable pageable);
 
+    List<Event> findAllByInitiatorIdAndState(Long id, EventState state, Pageable page);
+
+    List<Event> findAllByStateAndInitiatorIdIn(EventState state, List<Long> followers, Pageable page);
+
 }

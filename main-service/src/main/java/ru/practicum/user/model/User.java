@@ -6,6 +6,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Table(name = "users")
 @Setter
@@ -27,4 +28,11 @@ public class User {
     @NotBlank
     @Email
     private String email;
+    @ManyToMany
+    @JoinTable(name = "followers",
+            joinColumns = {@JoinColumn(name = "follower_id")},
+            inverseJoinColumns = {@JoinColumn(name = "user_id")})
+    private List<User> follower;
+    @ManyToMany(mappedBy = "follower")
+    private List<User> follow;
 }
